@@ -1,0 +1,15 @@
+[submodule "neurocontainers-arm64"]
+	path = neurocontainers-arm64
+	url = https://github.com/Vbitz/neurocontainers-arm64
+[submodule "neurocommand"]
+	path = neurocommand
+	url = https://github.com/Vbitz/neurocommand
+[submodule "neurodesktop"]
+	path = neurodesktop
+	url = https://github.com/Vbitz/neurodesktop
+[submodule "neurodesk-app"]
+	path = neurodesk-app
+	url = https://github.com/Vbitz/neurodesk-app
+[submodule "crumblecracker"]
+	path = crumblecracker
+	url = https://github.com/tinyrange/crumblecracker
