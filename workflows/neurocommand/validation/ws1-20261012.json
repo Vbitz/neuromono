@@ -1,0 +1,64 @@
+{
+  "cvmfs": {
+    "command": [
+      "c3d",
+      "-create",
+      "2x2x2",
+      "1x1x1mm",
+      "-shift",
+      "7",
+      "-voxel-sum"
+    ],
+    "cvmfs": [
+      {
+        "cache_bytes": 1958835,
+        "cache_limit_bytes": 67108864,
+        "fetched_bytes": 660002472,
+        "repository": "neurodesk.ardc.edu.au",
+        "requests": 1362
+      }
+    ],
+    "desktop_entries": 656,
+    "guest_image_digest": "sha256:2a0fce60e12d0f546e4265ac338de38c680d5c2514bb8cf6dde21ee02c7e23e7",
+    "guest_platform": "linux/amd64",
+    "image": "/cvmfs/neurodesk.ardc.edu.au/containers/convert3d_1.0.0_20210104/convert3d_1.0.0_20210104.simg",
+    "image_files": {
+      "/opt/convert3d-1.0.0/bin/c3d": "292849a95729b8af3f65dfa546b6a03806a9ad857abd160b838e99cdbc1da267"
+    },
+    "image_format": "sandbox",
+    "install": "/tmp/sa2-neurocommand-3mrea2ic/install",
+    "mode": "cvmfs",
+    "module": "convert3d/1.0.0",
+    "root": "/tmp/sa2-neurocommand-3mrea2ic",
+    "sif_sha256": null,
+    "source_sha256": "9a81599ce1c889ab76f58d0a97284a2e760139dea7a2d17f275b4155784b67fe",
+    "stdout_sha256": "3bbb06113ac148d0bfac735c50513877afe86f68c6e6d74b4e2940f05bfdb8b3"
+  },
+  "local": {
+    "command": [
+      "c3d",
+      "-create",
+      "2x2x2",
+      "1x1x1mm",
+      "-shift",
+      "7",
+      "-voxel-sum"
+    ],
+    "cvmfs": [],
+    "desktop_entries": 656,
+    "guest_image_digest": "sha256:2a0fce60e12d0f546e4265ac338de38c680d5c2514bb8cf6dde21ee02c7e23e7",
+    "guest_platform": "linux/amd64",
+    "image": "/artifacts/convert3d_1.0.0_20210104.simg",
+    "image_files": {
+      "/opt/convert3d-1.0.0/bin/c3d": "292849a95729b8af3f65dfa546b6a03806a9ad857abd160b838e99cdbc1da267"
+    },
+    "image_format": "sif",
+    "install": "/tmp/sa2-neurocommand-_s4gnm82/install",
+    "mode": "local",
+    "module": "convert3d/1.0.0",
+    "root": "/tmp/sa2-neurocommand-_s4gnm82",
+    "sif_sha256": "1ed9f046999378d8ef2ce38e59c95edc8db2c4397a8d817564a534b9d5097d97",
+    "source_sha256": "9a81599ce1c889ab76f58d0a97284a2e760139dea7a2d17f275b4155784b67fe",
+    "stdout_sha256": "3bbb06113ac148d0bfac735c50513877afe86f68c6e6d74b4e2940f05bfdb8b3"
+  }
+}
