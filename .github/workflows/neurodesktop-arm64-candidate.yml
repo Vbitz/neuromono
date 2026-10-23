@@ -68,7 +68,9 @@ jobs:
           printf '%s\n' "$actual" > candidate/image-id.txt
           printf '%s\n' "$IMAGE_REF" > candidate/image-tag.txt
           docker image inspect "$actual" > candidate/image-inspect.json
-      - name: Scan exact candidate
+      - name: Scan exact candidate (advisory for internal testing)
+        id: scan
+        continue-on-error: true
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ env.IMAGE_ID }}
@@ -80,6 +82,7 @@ jobs:
           timeout: 25m0s
           skip-files: /opt/rclone-v1.60.1-linux-amd64/README.txt,/opt/rclone-v1.60.1-linux-amd64/README.html,/opt/rclone-v1.60.1-linux-amd64/rclone.1,/opt/code-server/lib/vscode/package.json,/opt/code-server/lib/vscode/extensions/handlebars/package.json
       - name: Retain scan diagnostics even on failure
+        continue-on-error: true
         if: always() && steps.build.outcome == 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -108,6 +111,7 @@ jobs:
         run: bash .github/scripts/validate_image_runtime.sh "$IMAGE_ID" hpc
       - name: Export tested image and provenance
         env:
+          SCAN_OUTCOME: ${{ steps.scan.outcome }}
           SOURCE_SHA: ${{ steps.source.outputs.sha }}
         run: |
           set -euo pipefail
@@ -124,14 +128,20 @@ jobs:
               "image_tag": os.environ["IMAGE_REF"],
               "run_id": os.environ["GITHUB_RUN_ID"],
               "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
-              "checks": ["critical-vulnerability-scan", "slurm", "regular-no-cvmfs", "hpc"],
+              "purpose": "internal testing",
+              "security_scan": {"policy": "advisory", "outcome": os.environ["SCAN_OUTCOME"]},
+              "checks": ["slurm", "regular-no-cvmfs", "hpc"],
               "native_crumblecracker_acceptance": "not run",
           }
           Path("candidate/provenance.json").write_text(json.dumps(record, indent=2) + "\n")
           PY
+          if [ ! -f candidate/trivy.txt ]; then
+            printf 'Scan outcome: %s; scanner produced no report.\n' "$SCAN_OUTCOME" > candidate/trivy.txt
+          fi
           (cd candidate && sha256sum neurodesktop-arm64.tar.gz provenance.json image-inspect.json image-id.txt image-tag.txt neurodesktop-commit.txt neuromono-commit.txt trivy.txt > SHA256SUMS)
           {
-            echo '### Tested ARM64 candidate'
+            echo '### Internal ARM64 test candidate'
+            echo "Security scan (advisory): $SCAN_OUTCOME"
             echo "Neurodesktop: $SOURCE_SHA"
             echo "Image ID: $IMAGE_ID"
             echo 'Download the artifact, verify SHA256SUMS, and decompress the archive before importing into CrumbleCracker.'

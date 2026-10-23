@@ -36,7 +36,10 @@ substituting another image. Building and archiving this full image is disk-heavy
 Before upload, the job verifies the Buildx image ID and Linux/ARM64 architecture,
 scans CRITICAL vulnerabilities using the pinned source's exception policy, then
 runs the upstream Slurm, regular/no-CVMFS/package-only-sudo, and HPC checks on
-that exact image ID. A failing check prevents image upload. Check failure details
+that exact image ID. **These images are for internal testing. Security scanning
+is advisory, not an export gate:** findings or scanner errors are retained and
+recorded in `provenance.json` and the run summary, while runtime checks and export
+continue. Runtime-check failures still prevent upload. Check failure details
 in the Actions logs and the separate `neurodesktop-diagnostics-RUN_ID-ATTEMPT`
 artifact. Diagnostics are retained even when scanning fails; they contain no
 image archive and do not establish acceptance. Cleanup restores the temporary
