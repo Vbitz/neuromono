@@ -30,10 +30,11 @@ def _git_call(name, directory):
 
 def _github_call(function, directory, repository):
     def call(*args, **kwargs):
-        if "cwd" in kwargs or "repo" in kwargs:
-            fail("repository GitHub tools already select their repository")
+        if "cwd" in kwargs:
+            fail("repository GitHub tools already select their workspace")
         kwargs["cwd"] = directory
-        kwargs["repo"] = repository
+        if "repo" not in kwargs:
+            kwargs["repo"] = repository
         return function(*args, **kwargs)
 
     return call
