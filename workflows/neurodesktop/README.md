@@ -73,6 +73,9 @@ crumblecracker.smoke(
 ```
 
 This uses fresh development paths, not the user's existing sessions or storage.
+After the smoke import, `crumblecracker.guest_test(cache_dir=..., image="smoke",
+desktop=True)` runs the existing signed headless integration test against that
+prepared cache. See [the native validation record](validation/2026-10-23-native.md).
 The smoke check covers guest boot/commands and shared-folder persistence across
 restarts; it does not establish Glass display, clipboard, resizing, GPU or native
 GUI acceptance. Those remain separate tests of NeurodeskAppX with the same

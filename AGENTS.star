@@ -266,7 +266,17 @@ def _crumble_launch(app = "NeurodeskAppX"):
     suffix = ".exe" if platform.startswith("windows/") else ""
     return privileged.run(_crumble.workspace.path("build/" + app + suffix), "-cache-dir", _crumble.workspace.path("build/sa2-" + app + "/cache"), "-storage", _crumble.workspace.path("build/sa2-" + app + "/shared"), cwd = _crumble.workspace, background = True, kill_tree = True, timeout_ms = 0)
 
-crumblecracker = _crumble + module("crumblecracker", build = _crumble_build, test = _crumble_tests, smoke = _crumble_smoke, launch = _crumble_launch)
+def _crumble_guest_test(cache_dir, image = "smoke", desktop = False):
+    """Run the existing signed, opt-in guest integration test on an isolated prepared candidate."""
+    if not cache_dir.startswith("build/") or ".." in cache_dir.split("/"):
+        fail("guest acceptance must use a build/ development cache")
+    suffix = ".exe" if platform.startswith("windows/") else ""
+    binary = _crumble.workspace.path("build/headless-acceptance" + suffix)
+    privileged.run("go", "test", "-c", "-o", binary, "./internal/desktopapp", cwd = _crumble.workspace, check = True, timeout_ms = 1800000)
+    if platform.startswith("darwin/"):
+        privileged.run("codesign", "--force", "--sign", "-", "--entitlements", _crumble.workspace.path("tools/entitlements.xml"), binary, cwd = _crumble.workspace, check = True)
+    return privileged.run(binary, "-test.run", "^TestHeadlessGuestIntegration$", "-test.v", "-test.timeout", "10m", cwd = _crumble.workspace, env = {"NDAPPX_HEADLESS_TEST_CACHE": _crumble.workspace.path(cache_dir), "NDAPPX_HEADLESS_TEST_IMAGE": image, "NDAPPX_HEADLESS_TEST_DESKTOP": "1" if desktop else "0", "NDAPPX_HEADLESS_TEST_EPHEMERAL": "0"}, check = False, timeout_ms = 660000)
+crumblecracker = _crumble + module("crumblecracker", build = _crumble_build, test = _crumble_tests, smoke = _crumble_smoke, launch = _crumble_launch, guest_test = _crumble_guest_test)
 # Deferred: a typed client for NeurodeskAppX's headless API and native window/GPU
 # automation. The existing headless API explicitly rejects GPU acceleration.
 # crumblecracker.test_rendering(gpu = True)
@@ -275,7 +285,15 @@ crumblecracker = _crumble + module("crumblecracker", build = _crumble_build, tes
 def _mono_dispatch(ref = "main"):
     """Dispatch only Neuromono's pinned ARM64 candidate workflow."""
     return github_workflow_run("neurodesktop-arm64-candidate.yml", repo = "Vbitz/neuromono", cwd = _root, ref = ref, check = True)
-neuromono = module("neuromono", workspace = _root, git = module("git", **{name: _git_call(name, _root) for name in ["status", "diff", "add", "commit", "push", "submodule_status", "submodule_update", "submodule_sync"]}), github = module("github", run_list = _github_call(github_tools.run_list, _root, "Vbitz/neuromono"), run_view = _github_call(github_tools.run_view, _root, "Vbitz/neuromono"), run_watch = _github_call(github_tools.run_watch, _root, "Vbitz/neuromono"), run_artifacts = _github_call(github_tools.run_artifacts, _root, "Vbitz/neuromono"), run_download = _github_call(github_download, _root, "Vbitz/neuromono")), dispatch_candidate = _mono_dispatch, load_image = load_archive)
+def _mono_unpack_candidate(directory):
+    """Verify downloaded candidate checksums and decompress its Docker archive."""
+    if not directory.startswith("workflows/neurodesktop/validation/run-") or ".." in directory.split("/"):
+        fail("candidate directory must be an isolated validation/run-* directory")
+    location = _root.path(directory)
+    privileged.run("shasum", "-a", "256", "-c", "SHA256SUMS", cwd = location, check = True, timeout_ms = 1800000)
+    privileged.run("gzip", "-dk", "neurodesktop-arm64.tar.gz", cwd = location, check = True, timeout_ms = 1800000)
+    return _root.path(directory + "/neurodesktop-arm64.tar")
+neuromono = module("neuromono", workspace = _root, git = module("git", **{name: _git_call(name, _root) for name in ["status", "diff", "add", "commit", "push", "submodule_status", "submodule_update", "submodule_sync"]}), github = module("github", run_list = _github_call(github_tools.run_list, _root, "Vbitz/neuromono"), run_view = _github_call(github_tools.run_view, _root, "Vbitz/neuromono"), run_watch = _github_call(github_tools.run_watch, _root, "Vbitz/neuromono"), run_artifacts = _github_call(github_tools.run_artifacts, _root, "Vbitz/neuromono"), run_download = _github_call(github_download, _root, "Vbitz/neuromono")), dispatch_candidate = _mono_dispatch, load_image = load_archive, unpack_candidate = _mono_unpack_candidate)
 # Aspirational whole-stack acceptance: source override for local Neurocommand,
 # explicit image handoff to each app backend, native UI checks, and a manifest
 # linking every tested revision/image/test result before updating parent pins.
