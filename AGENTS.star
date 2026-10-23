@@ -272,7 +272,10 @@ crumblecracker = _crumble + module("crumblecracker", build = _crumble_build, tes
 # crumblecracker.test_rendering(gpu = True)
 # crumblecracker.test_rendering(gpu = False)
 
-neuromono = module("neuromono", workspace = _root, git = module("git", **{name: _git_call(name, _root) for name in ["status", "diff", "add", "commit", "push", "submodule_status", "submodule_update", "submodule_sync"]}), load_image = load_archive)
+def _mono_dispatch(ref = "main"):
+    """Dispatch only Neuromono's pinned ARM64 candidate workflow."""
+    return github_workflow_run("neurodesktop-arm64-candidate.yml", repo = "Vbitz/neuromono", cwd = _root, ref = ref, check = True)
+neuromono = module("neuromono", workspace = _root, git = module("git", **{name: _git_call(name, _root) for name in ["status", "diff", "add", "commit", "push", "submodule_status", "submodule_update", "submodule_sync"]}), github = module("github", run_list = _github_call(github_tools.run_list, _root, "Vbitz/neuromono"), run_view = _github_call(github_tools.run_view, _root, "Vbitz/neuromono"), run_watch = _github_call(github_tools.run_watch, _root, "Vbitz/neuromono"), run_artifacts = _github_call(github_tools.run_artifacts, _root, "Vbitz/neuromono"), run_download = _github_call(github_download, _root, "Vbitz/neuromono")), dispatch_candidate = _mono_dispatch, load_image = load_archive)
 # Aspirational whole-stack acceptance: source override for local Neurocommand,
 # explicit image handoff to each app backend, native UI checks, and a manifest
 # linking every tested revision/image/test result before updating parent pins.
