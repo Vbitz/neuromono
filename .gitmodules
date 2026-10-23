@@ -6,7 +6,7 @@
 	url = https://github.com/Vbitz/neurocommand
 [submodule "neurodesktop"]
 	path = neurodesktop
-	url = https://github.com/neurodesk/neurodesktop
+	url = https://github.com/Vbitz/neurodesktop
 	branch = main
 [submodule "neurodesk-app"]
 	path = neurodesk-app

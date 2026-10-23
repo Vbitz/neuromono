@@ -4,7 +4,11 @@
 workflow. It builds the standard `neurodesktop/Dockerfile` at the gitlink pinned
 by the selected Neuromono commit. It never follows upstream main during the job,
 uses a derived Glass image, or substitutes a published Neurodesktop image.
-Update and commit the submodule pin first when a newer upstream source is wanted.
+Neuromono tracks `Vbitz/neurodesktop`, branch `main`. To adopt newer upstream
+source, first synchronize the fork's `main` with `neurodesk/neurodesktop/main`
+using a fast-forward when possible; preserve and review any divergent fork
+commits rather than force-resetting them. Then update and commit Neuromono's
+submodule pin. Keep the submodule URL pointing to the fork.
 
 ## Build and download
 
