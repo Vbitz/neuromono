@@ -98,7 +98,7 @@ def _desktop_ready(candidate):
     return candidate.wait_ready(["curl", "--silent", "--show-error", "--output", "/dev/null", "--max-time", "2", "http://127.0.0.1:8888/api/status"], attempts = 90, interval_seconds = 2)
 
 def _desktop_unit(*paths):
-    return python_test(cwd = _desktop.workspace, runner = "pytest", check = True, timeout_ms = 1800000, *(paths if paths else ["tests/unit"]))
+    return privileged.run("uv", "run", "--no-project", "--with", "pytest==8.4.2", "python", "-m", "pytest", cwd = _desktop.workspace, check = True, timeout_ms = 1800000, *(paths if paths else ["tests/unit"]))
 
 def _desktop_image_tests(candidate, *paths):
     return candidate.exec(["pytest"] + list(paths if paths else ["/opt/tests/"]), user = "jovyan", env = {"NEURODESKTOP_TEST_ALLOW_GLOBAL_DESKTOP_SERVICES": "1"}, check = True, timeout_ms = 1800000)
@@ -234,7 +234,10 @@ def _app_package(target):
         fail("installer target must be linux-64, linux-arm64, mac or win")
     return yarn_run("dist:" + target, cwd = _app.workspace, check = True, timeout_ms = 1800000)
 
-neurodesk_app = _app + module("neurodesk_app", sync = _app_sync, build = _app_build, test = _app_tests, launch = _app_launch, package = _app_package)
+def _app_acceptance(*args):
+    """Run the checkout's isolated app/Glass acceptance harness, retaining screenshots under build/."""
+    return privileged.run("node", "scripts/crumblecracker-e2e.js", cwd = _app.workspace, env = {"NEURODESK_CC_BINARY": _crumble.workspace.path("build/NeurodeskAppX")}, check = False, background = True, kill_tree = True, timeout_ms = 3600000, *args)
+neurodesk_app = _app + module("neurodesk_app", sync = _app_sync, build = _app_build, test = _app_tests, launch = _app_launch, package = _app_package, acceptance=_app_acceptance)
 # Docker/Podman can use image.tag("vnmd/neurodesktop:<local-tag>") and select that
 # tag in app settings. Confirm the app uses the same engine/image before testing.
 # Deferred: isolated app profiles, full image override, TinyRange local image
