@@ -90,8 +90,11 @@ dispatch. That script requires native Linux ARM64, Docker Buildx, Apptainer,
 DataLad and git-annex; Apple Silicon alone does not satisfy its native Linux gate.
 Actions must remain disabled in the recipe fork; dispatch the orchestration repo.
 
-Each repository's `github` namespace supports PR creation/checks, run inspection,
-watching, artifact listing and named artifact download. Download into an existing
+Each repository's `github` namespace supports PR creation/checks/merging, run
+inspection, watching, artifact listing and named artifact download. `pr_merge`
+supports merge/squash/rebase, auto-merge and `match_head_commit`; it never bypasses
+repository protections with an admin override. Inspect checks/reviews first and
+verify actual merge completion after queue submission. Download into an existing
 dedicated directory. Match the run's source SHA, platform and image digest before
 reproduction; a published artifact smoke test does not establish recipe fulltest
 acceptance. Large artifacts remain host-local. Image handles support exact-image

@@ -1,3 +1,4 @@
+load("//stdlib/github.star", github_pr_merge="pr_merge")
 """Neuromono development workflows.
 
 Each repository owns its workspace, Git/GitHub tools and commands. Commands run
@@ -59,6 +60,7 @@ def _repository(path, repository):
         github = module(
             "github",
             pr_create = _github_call(github_pr_create, directory, repository),
+            pr_merge = _github_call(github_pr_merge, directory, repository),
             pr_checks = _github_call(github_tools.pr_checks, directory, repository),
             run_list = _github_call(github_tools.run_list, directory, repository),
             run_view = _github_call(github_tools.run_view, directory, repository),
