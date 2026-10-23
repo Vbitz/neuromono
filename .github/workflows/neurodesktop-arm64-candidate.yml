@@ -79,6 +79,20 @@ jobs:
           trivyignores: ./neurodesktop/.trivyignore.yaml
           timeout: 25m0s
           skip-files: /opt/rclone-v1.60.1-linux-amd64/README.txt,/opt/rclone-v1.60.1-linux-amd64/README.html,/opt/rclone-v1.60.1-linux-amd64/rclone.1,/opt/code-server/lib/vscode/package.json,/opt/code-server/lib/vscode/extensions/handlebars/package.json
+      - name: Retain scan diagnostics even on failure
+        if: always() && steps.build.outcome == 'success'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: neurodesktop-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            candidate/trivy.txt
+            candidate/image-inspect.json
+            candidate/image-id.txt
+            candidate/image-tag.txt
+            candidate/neurodesktop-commit.txt
+            candidate/neuromono-commit.txt
+          if-no-files-found: error
+          retention-days: 3
       - name: Validate Slurm with default permissions
         working-directory: neurodesktop
         run: bash scripts/verify_slurm_image.sh "$IMAGE_ID"

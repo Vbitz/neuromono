@@ -37,7 +37,10 @@ Before upload, the job verifies the Buildx image ID and Linux/ARM64 architecture
 scans CRITICAL vulnerabilities using the pinned source's exception policy, then
 runs the upstream Slurm, regular/no-CVMFS/package-only-sudo, and HPC checks on
 that exact image ID. A failing check prevents image upload. Check failure details
-in the Actions logs. Cleanup restores the temporary user-namespace setting.
+in the Actions logs and the separate `neurodesktop-diagnostics-RUN_ID-ATTEMPT`
+artifact. Diagnostics are retained even when scanning fails; they contain no
+image archive and do not establish acceptance. Cleanup restores the temporary
+user-namespace setting.
 
 ## Import without Docker Desktop
 
