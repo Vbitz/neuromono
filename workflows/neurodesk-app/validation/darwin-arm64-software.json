@@ -1,0 +1,39 @@
+{
+  "afterDesktop": {
+    "graphics": "name of display: :0\ndisplay: :0  screen: 0\ndirect rendering: Yes\nExtended renderer info (GLX_MESA_query_renderer):\n    Vendor: Mesa (0xffffffff)\n    Device: llvmpipe (LLVM 21.1.8, 128 bits) (0xffffffff)\n    Version: 26.0.8\n    Accelerated: no\n    Video memory: 7935MB\n    Unified memory: yes\n    Preferred profile: core (0x1)\n    Max core profile version: 4.5\n    Max compat profile version: 4.5\n    Max GLES1 profile version: 1.1\n    Max GLES[23] profile version: 3.2\nMemory info (GL_ATI_meminfo):\n    VBO free memory - total: 63 MB, largest block: 63 MB\n    VBO free aux. memory - total: 6411 MB, largest block: 6411 MB\n    Texture free memory - total: 63 MB, largest block: 63 MB\n    Texture free aux. memory - total: 6411 MB, largest block: 6411 MB\n    Renderbuffer free memory - total: 63 MB, largest block: 63 MB\n    Renderbuffer free aux. memory - total: 6411 MB, largest block: 6411 MB\nMemory info (GL_NVX_gpu_memory_info):\n    Dedicated video memory: 4294355133 MB\n    Total available memory: 4294363069 MB\n    Currently available dedicated video memory: 63 MB\nOpenGL vendor string: Mesa\nOpenGL renderer string: llvmpipe (LLVM 21.1.8, 128 bits)\nOpenGL core profile version string: 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3\nOpenGL core profile shading language version string: 4.50\nOpenGL core profile context flags: (none)\nOpenGL core profile profile mask: core profile\n\nOpenGL version string: 4.5 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3\nOpenGL shading language version string: 4.50\nOpenGL context flags: (none)\nOpenGL profile mask: compatibility profile\n\nOpenGL ES profile version string: OpenGL ES 3.2 Mesa 26.0.8-1ubuntu0.3\nOpenGL ES profile shading language version string: OpenGL ES GLSL ES 3.20",
+    "graphics_exit_code": 0,
+    "services": "active\nactive\nx11-ready"
+  },
+  "archive_sha256": "3afd3f65a992a847072b6cc26a87f9a08ae00f9edc0a5ada19ed034168b7f63d",
+  "beforeDesktop": {
+    "graphics": "Error: unable to open display :0",
+    "graphics_exit_code": 255,
+    "services": "active\ninactive"
+  },
+  "candidate": "docker-archive:neurodesktop-arm64.tar",
+  "candidate_workflow_run": "39907142801",
+  "cvmfs_enabled": false,
+  "desktopColors": 645,
+  "gpuRequested": false,
+  "host_platform": "darwin/arm64",
+  "image_id": "sha256:4e8145dabe525aa5df8229105fe24d3df15a98efd9790f4d66e161c1f77e43a7",
+  "isolated_profile": "neurodesk-app/build/cc-gpu-yAYHg8/profile",
+  "sources": {
+    "crumblecracker": "8dea4fe4cb81c41037aa19d648fd47c101dce0b4",
+    "neurodesk_app": "7e31e4c5f7dfc746e46d4a2b14e875b04ec8c379",
+    "neurodesktop": "433cddfa58ab6424adaa11e2f12616c93c192e0a"
+  },
+  "stages": [
+    "application-launched",
+    "jupyter-authenticated",
+    "checking-pre-desktop-services",
+    "pre-desktop-services-checked",
+    "authentication-required",
+    "lab-view-created",
+    "jupyter-launcher-visible",
+    "launcher-opened-native-window",
+    "launcher-action-and-desktop-capture-passed",
+    "owned-backend-shutdown"
+  ],
+  "success": true
+}

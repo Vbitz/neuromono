@@ -217,13 +217,13 @@ neurocommand = _command + module("neurocommand", test = _command_tests, build_te
 # Repeat mode = "local" in a guest without CVMFS. The spec pins the SIF and scientific output.
 
 def _app_sync():
-    return yarn_install(cwd = _app.workspace, check = True, timeout_ms = 1800000)
+    return privileged.run("npm", "exec", "--yes", "--package=yarn@1.22.22", "--", "yarn", "install", "--frozen-lockfile", cwd = _app.workspace, check = True, timeout_ms = 1800000)
 
 def _app_build():
-    return yarn_run("build", cwd = _app.workspace, check = True, timeout_ms = 1800000)
+    return privileged.run("npm", "exec", "--yes", "--package=yarn@1.22.22", "--", "yarn", "build", cwd = _app.workspace, check = True, timeout_ms = 1800000)
 
 def _app_tests(*args):
-    return yarn_run("test", cwd = _app.workspace, check = True, timeout_ms = 1800000, *args)
+    return privileged.run("npm", "exec", "--yes", "--package=yarn@1.22.22", "--", "yarn", "test", cwd = _app.workspace, check = True, timeout_ms = 1800000, *args)
 
 def _app_launch():
     """Launch the compiled app on this native peer; close the returned process afterward."""
@@ -237,7 +237,19 @@ def _app_package(target):
 def _app_acceptance(*args):
     """Run the checkout's isolated app/Glass acceptance harness, retaining screenshots under build/."""
     return privileged.run("node", "scripts/crumblecracker-e2e.js", cwd = _app.workspace, env = {"NEURODESK_CC_BINARY": _crumble.workspace.path("build/NeurodeskAppX")}, check = False, background = True, kill_tree = True, timeout_ms = 3600000, *args)
-neurodesk_app = _app + module("neurodesk_app", sync = _app_sync, build = _app_build, test = _app_tests, launch = _app_launch, package = _app_package, acceptance=_app_acceptance)
+def _app_check(tool, *paths):
+    """Run scoped formatting, lint, or workflow syntax checks in the app checkout."""
+    for path in paths:
+        if path.startswith(("-", "/")) or ".." in path.split("/"):
+            fail("checks require workspace-relative paths")
+    if tool == "format":
+        return privileged.run("node", "node_modules/prettier/bin-prettier.js", "--write", cwd = _app.workspace, check = True, *paths)
+    if tool == "lint":
+        return privileged.run("node", "node_modules/eslint/bin/eslint.js", cwd = _app.workspace, check = False, *paths)
+    if tool == "workflows" and not paths:
+        return privileged.run("node", "scripts/check-workflows.js", cwd = _app.workspace, check = True)
+    fail("check must be format, lint or workflows")
+neurodesk_app = _app + module("neurodesk_app", sync = _app_sync, build = _app_build, test = _app_tests, launch = _app_launch, package = _app_package, acceptance=_app_acceptance, check=_app_check)
 # Docker/Podman can use image.tag("vnmd/neurodesktop:<local-tag>") and select that
 # tag in app settings. Confirm the app uses the same engine/image before testing.
 # Deferred: isolated app profiles, full image override, TinyRange local image

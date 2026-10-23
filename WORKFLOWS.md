@@ -53,7 +53,7 @@ No local Docker Desktop or registry publication is required.
 - Compile a new version.
 - Test locally on Windows, macOS, and Linux.
 - Run against a locally built Neurodesktop image.
-- Test Docker, Podman, and TinyRange backends.
+- Test Docker, Podman, and CrumbleCracker backends.
 - Build and test platform installers.
 
 ## CrumbleCracker / NeurodeskAppX
@@ -105,15 +105,18 @@ lockfile. Install Node/Corepack and prepare that Yarn release on each host;
 SA2's Yarn helper will not download a package manager implicitly.
 Docker/Podman can use a candidate tagged
 `vnmd/neurodesktop:<local-tag>` in the same engine and selected in app settings.
-Native UI assertions, isolated app profiles, installer installation tests and
-TinyRange local-image handoff remain commented. Packaging a Windows/Linux
+`neurodesk_app.acceptance(archive, mode)` exercises the real app and native Glass
+window with isolated state, a local Docker archive, GPU/software checks, and
+screenshots. See [native validation](workflows/neurodesk-app/VALIDATION.md).
+Installer installation tests remain separate. Packaging a Windows/Linux
 installer on macOS does not prove it installs or runs on that OS.
 
 CrumbleCracker wraps the existing two-app build, Go tests, native launches and
 product smoke executable. The smoke helper signs the executable with the existing
 hypervisor entitlements on macOS and uses separate development cache/shared paths.
 It tests guest execution, shared writes and persistence across VM restarts.
-Native window/GPU automation remains deferred. Neurocommand exports unit tests,
+Native window/GPU acceptance is driven through the real app harness described
+in [native validation](workflows/neurodesk-app/VALIDATION.md). Neurocommand exports unit tests,
 `build_test_image` and `acceptance`; its unit-test helper accepts `executor=` to
 reuse a bound guest runner. See the acceptance procedure below.
 
@@ -299,7 +302,7 @@ also need a filesystem transport with the required native platform semantics.
 | Neurocommand guest tests through `sandbox.linux` | Linux/amd64 peer with KVM required today |
 | Neurodesk App macOS build, launch and packaging | Local with Node/Yarn and packaging prerequisites |
 | CrumbleCracker ARM64 VM smoke/share/persistence | Local with a signed executable and suitable image |
-| macOS GPU/software display checks | Local native app/window; automation deferred |
+| macOS GPU/software display checks | Real app harness passed on Apple Silicon; see native validation |
 | Windows/Linux app and installer acceptance | Native OS machines or suitable disposable environments |
 
 On the initial evaluation host Docker and Podman CLIs were installed but their
