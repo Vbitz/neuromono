@@ -21,6 +21,11 @@ repository. It does not claim container, GUI, VM or scientific test coverage.
 
 ## Neurodesktop
 
+The [manual ARM64 candidate workflow](workflows/neurodesktop/README.md) builds
+the pinned upstream submodule in Neuromono Actions, validates the exact image,
+and exports a checksummed Docker archive for direct CrumbleCracker import.
+No local Docker Desktop or registry publication is required.
+
 - Build a new image based on local changes.
 - Run the image on arm64 Linux/macOS and amd64 Linux.
 - Run unit tests and tests inside a locally built image.
