@@ -272,7 +272,7 @@ crumblecracker = _crumble + module("crumblecracker", build = _crumble_build, tes
 # crumblecracker.test_rendering(gpu = True)
 # crumblecracker.test_rendering(gpu = False)
 
-neuromono = module("neuromono", workspace = _root, git = module("git", **{name: _git_call(name, _root) for name in ["status", "diff", "add", "commit", "submodule_status", "submodule_update"]}), load_image = load_archive)
+neuromono = module("neuromono", workspace = _root, git = module("git", **{name: _git_call(name, _root) for name in ["status", "diff", "add", "commit", "push", "submodule_status", "submodule_update", "submodule_sync"]}), load_image = load_archive)
 # Aspirational whole-stack acceptance: source override for local Neurocommand,
 # explicit image handoff to each app backend, native UI checks, and a manifest
 # linking every tested revision/image/test result before updating parent pins.
@@ -282,6 +282,8 @@ neuromono = module("neuromono", workspace = _root, git = module("git", **{name: 
 # Browser downloads remain limited to 16 MiB; CAH files remain limited to 1 GiB.
 
 environment = {
+    # Configuration installation requires explicit user approval.
+    "edit_agents_star": privileged.edit_agents_star,
     "neuromono": neuromono,
     "neurodesktop": neurodesktop,
     "neurocontainers_arm64": neurocontainers_arm64,
