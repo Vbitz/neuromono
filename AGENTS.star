@@ -40,6 +40,26 @@ def _github_call(function, directory, repository):
     return call
 
 def _repository(path, repository):
+    def _github_pr_edit(number, title = None, body = None, base = None, repo = None, cwd = None, check = True):
+        """Edit PR metadata in any selected repository without changing its branch."""
+        if not str(number).isdigit() or not repo or repo.startswith("-"):
+            fail("A numeric PR and explicit repository are required")
+        args = ["pr", "edit", str(number), "--repo", repo]
+        for flag, value in [("--title", title), ("--body", body), ("--base", base)]:
+            if value != None:
+                args += [flag, value]
+        if title == None and body == None and base == None:
+            fail("Specify PR metadata to edit")
+        return privileged.run("gh", cwd = cwd, check = check, timeout_ms = 120000, env = {"GH_PROMPT_DISABLED": "1", "GH_PAGER": "cat"}, *args)
+
+    def _github_pr_state(number, state, comment = None, repo = None, cwd = None, check = True):
+        """Close or reopen a PR, optionally leaving a redirect; never delete branches."""
+        if state not in ["close", "reopen"] or not str(number).isdigit() or not repo or repo.startswith("-"):
+            fail("Specify close/reopen, a numeric PR, and a repository")
+        args = ["pr", state, str(number), "--repo", repo]
+        if comment != None:
+            args += ["--comment", comment]
+        return privileged.run("gh", cwd = cwd, check = check, timeout_ms = 120000, env = {"GH_PROMPT_DISABLED": "1", "GH_PAGER": "cat"}, *args)
     directory = privileged.workspace(path)
     return module(
         path,
@@ -49,6 +69,11 @@ def _repository(path, repository):
             "status",
             "diff",
             "log",
+            "show",
+            "rev_parse",
+            "remotes",
+            "fetch",
+            "merge",
             "branches",
             "switch",
             "add",
@@ -61,6 +86,8 @@ def _repository(path, repository):
         github = module(
             "github",
             pr_create = _github_call(github_pr_create, directory, repository),
+            pr_edit = _github_call(_github_pr_edit, directory, repository),
+            pr_state = _github_call(_github_pr_state, directory, repository),
             pr_merge = _github_call(github_pr_merge, directory, repository),
             pr_checks = _github_call(github_tools.pr_checks, directory, repository),
             run_list = _github_call(github_tools.run_list, directory, repository),
